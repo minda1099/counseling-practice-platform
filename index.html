@@ -300,8 +300,15 @@ function addMsg(role, text, className){
   div.textContent = text;
   document.getElementById('chatBox').appendChild(div);
   document.getElementById('chatBox').scrollTop = document.getElementById('chatBox').scrollHeight;
+  // Re-evaluate button states after each message
+  updateButtonStates();
 }
 function addSystemMsg(text){ addMsg('system', text, 'system'); }
+function updateButtonStates(){
+  if (!isActive) return;
+  document.getElementById('saveBtn').disabled = messages.length === 0;
+  document.getElementById('feedbackBtn').disabled = mode !== 'counselor';
+}
 function addTyping(){
   const div = document.createElement('div');
   div.className = 'typing'; div.id = 'typingIndicator';
@@ -425,6 +432,7 @@ async function sendMessage(){
   if (!text) return;
   input.value = ''; addMsg('user', text, 'user');
   messages.push({ role: 'user', content: text });
+  updateButtonStates();
 
   if (text === '结束') {
     addSystemMsg('练习结束。对话已自动保存。');
