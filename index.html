@@ -26,14 +26,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;backgrou
 /* Chat */
 .chat-box{flex:1;padding:12px;overflow-y:auto;display:flex;flex-direction:column;gap:10px;-webkit-overflow-scrolling:touch}
 .input-area{padding:10px 10px calc(10px + var(--safe-bottom));border-top:1px solid #eee;display:flex;gap:8px;background:#fff;position:sticky;bottom:0}
-.input-area input{flex:1;padding:12px 16px;border:2px solid #e0d8d0;border-radius:24px;font-size:16px;outline:none;min-width:0}
-.input-area input:focus{border-color:var(--g)}
-.input-area button{padding:10px 18px;background:var(--g);color:#fff;border:none;border-radius:24px;font-size:15px;cursor:pointer;white-space:nowrap}
+.input-area textarea{flex:1;padding:12px 16px;border:2px solid #e0d8d0;border-radius:20px;font-size:16px;outline:none;min-width:0;resize:none;font-family:inherit;line-height:1.5;max-height:160px}
+.input-area textarea:focus{border-color:var(--g)}
+.input-area button{padding:10px 18px;background:var(--g);color:#fff;border:none;border-radius:24px;font-size:15px;cursor:pointer;white-space:nowrap;align-self:flex-end}
 .input-area button:active{background:var(--gd)}
 .input-area button:disabled{background:#ccc;cursor:not-allowed}
-.mic-btn{background:none!important;border:none!important;font-size:22px;padding:8px 10px!important;cursor:pointer;border-radius:50%!important;width:42px;height:42px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.mic-btn.listening{background:#e74c3c!important;animation:pulse 1.5s infinite}
-@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(231,76,60,.4)}50%{box-shadow:0 0 0 12px rgba(231,76,60,0)}}
 
 /* Messages */
 .msg{max-width:88%;padding:11px 13px;border-radius:12px;line-height:1.6;font-size:15px;white-space:pre-wrap;word-break:break-word}
@@ -182,8 +179,7 @@ select{width:100%;padding:11px 14px;border:2px solid #e0d8d0;border-radius:10px;
       <div class="msg system">👋 欢迎！选择技术和模式后点击「开始练习」</div>
     </div>
     <div class="input-area">
-      <button class="mic-btn" id="micBtn" onclick="toggleMic()" title="语音输入">🎤</button>
-      <input type="text" id="userInput" placeholder="输入或语音…" onkeydown="if(event.key==='Enter')sendMessage()">
+      <textarea id="userInput" placeholder="输入或语音…" rows="1" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMessage()}" oninput="autoResize(this)"></textarea>
       <button onclick="sendMessage()" id="sendBtn" disabled>发送</button>
     </div>
   </div>
@@ -228,8 +224,8 @@ let technique = '28';
 let messages = [];
 let isActive = false;
 let turnCount = 0;
-let isListening = false;
-let recognition = null;
+// Auto-resize textarea
+function autoResize(el){ el.style.height='auto'; el.style.height=Math.min(el.scrollHeight,160)+'px'; }
 
 // Load saved settings - default to DeepSeek config
 const savedApiKey = localStorage.getItem('counseling_api_key') || localStorage.getItem('deepseek_key') || '';
@@ -527,138 +523,6 @@ function exportHistory(){
   const a = document.createElement('a'); a.href = URL.createObjectURL(b);
   a.download = 'counseling_history_'+new Date().toISOString().slice(0,10)+'.md'; a.click();
   addSystemMsg('📥 已导出');
-}
-
-// ==================== Speech Recognition ====================
-let mediaRecorder = null;
-let audioChunks = [];
-
-function toggleMic(){
-  if (isListening) { stopListening(); return; }
-
-  // Try browser Web Speech API first (won't work in China)
-  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (SpeechRecognition) {
-    tryBrowserSTT(SpeechRecognition);
-  } else {
-    tryRecordThenAPI();
-  }
-}
-
-function tryBrowserSTT(SpeechRecognition) {
-  recognition = new SpeechRecognition();
-  recognition.lang = 'zh-CN';
-  recognition.interimResults = true;
-  recognition.continuous = true;
-
-  recognition.onresult = (event) => {
-    let transcript = '';
-    for (let i = event.resultIndex; i < event.results.length; i++) {
-      transcript += event.results[i][0].transcript;
-    }
-    document.getElementById('userInput').value = transcript;
-  };
-
-  recognition.onerror = (event) => {
-    if (event.error === 'no-speech' || event.error === 'aborted') return;
-    // Network error = can't reach Google (common in China). Fall back to recording.
-    if (event.error === 'network' || event.error === 'not-allowed') {
-      stopListening();
-      addSystemMsg('🎤 浏览器语音不可用，改用录音转文字…');
-      tryRecordThenAPI();
-      return;
-    }
-    addSystemMsg('🎤 语音出错: ' + event.error);
-    stopListening();
-  };
-
-  recognition.onend = () => {
-    if (isListening) { try { recognition.start(); } catch(e) { stopListening(); } }
-  };
-
-  try { recognition.start(); startListeningUI(); } catch(e) { tryRecordThenAPI(); }
-}
-
-async function tryRecordThenAPI() {
-  try {
-    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-    mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm;codecs=opus' });
-    audioChunks = [];
-
-    mediaRecorder.ondataavailable = (e) => { if (e.data.size > 0) audioChunks.push(e.data); };
-
-    mediaRecorder.onstop = async () => {
-      stream.getTracks().forEach(t => t.stop());
-      const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
-      await transcribeAudio(audioBlob);
-    };
-
-    mediaRecorder.start();
-    startListeningUI();
-    addSystemMsg('🎤 录音中，点击🔴停止并转文字');
-  } catch(e) {
-    stopListening();
-    addSystemMsg('❌ 无法访问麦克风: ' + e.message);
-  }
-}
-
-async function transcribeAudio(audioBlob) {
-  addSystemMsg('📝 正在转文字…');
-  const apiKey = localStorage.getItem('counseling_api_key');
-  const apiBase = localStorage.getItem('counseling_api_base') || 'https://api.deepseek.com/v1';
-
-  if (!apiKey) {
-    addSystemMsg('❌ 请先设置API Key');
-    stopListening();
-    return;
-  }
-
-  try {
-    const formData = new FormData();
-    formData.append('file', audioBlob, 'recording.webm');
-    formData.append('model', 'whisper-1');
-    formData.append('language', 'zh');
-
-    const resp = await fetch(`${apiBase}/audio/transcriptions`, {
-      method: 'POST',
-      headers: { 'Authorization': `Bearer ${apiKey}` },
-      body: formData
-    });
-
-    if (!resp.ok) {
-      // DeepSeek doesn't support audio API - tell user
-      if (resp.status === 404 || resp.status === 405) {
-        addSystemMsg('❌ 当前API不支持语音转文字。请使用支持 whisper 的接口（如 OpenAI），或使用VPN后重试浏览器语音。');
-        stopListening();
-        return;
-      }
-      throw new Error(`HTTP ${resp.status}`);
-    }
-
-    const data = await resp.json();
-    document.getElementById('userInput').value = data.text || '';
-    document.getElementById('userInput').focus();
-    addSystemMsg('✅ 转文字完成，可编辑后发送');
-  } catch(e) {
-    addSystemMsg('❌ 转文字失败: ' + e.message);
-  }
-  stopListening();
-}
-
-function startListeningUI() {
-  isListening = true;
-  document.getElementById('micBtn').textContent = '🔴';
-  document.getElementById('micBtn').classList.add('listening');
-  document.getElementById('userInput').placeholder = '聆听中…点击🔴停止';
-}
-
-function stopListening(){
-  isListening = false;
-  if (recognition) { try { recognition.stop(); } catch(e) {} }
-  if (mediaRecorder && mediaRecorder.state === 'recording') { mediaRecorder.stop(); }
-  document.getElementById('micBtn').textContent = '🎤';
-  document.getElementById('micBtn').classList.remove('listening');
-  document.getElementById('userInput').placeholder = '输入或语音…';
 }
 
 // Init
