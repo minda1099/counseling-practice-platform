@@ -2,135 +2,141 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>心理咨询新手练习平台</title>
 <style>
-* { margin: 0; padding: 0; box-sizing: border-box; }
-body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #f5f0eb; color: #333; min-height: 100vh; }
-.header { background: linear-gradient(135deg, #2d5a4b 0%, #3d7a63 100%); color: #fff; padding: 16px 24px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 8px rgba(0,0,0,.15); }
-.header h1 { font-size: 20px; font-weight: 600; }
-.header p { font-size: 12px; opacity: .8; }
-.container { max-width: 1200px; margin: 0 auto; padding: 20px; display: flex; gap: 20px; height: calc(100vh - 120px); }
-.sidebar { width: 320px; flex-shrink: 0; background: #fff; border-radius: 12px; padding: 20px; box-shadow: 0 1px 4px rgba(0,0,0,.08); overflow-y: auto; }
-.main { flex: 1; display: flex; flex-direction: column; background: #fff; border-radius: 12px; box-shadow: 0 1px 4px rgba(0,0,0,.08); }
-.chat-box { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; }
-.input-area { padding: 16px 20px; border-top: 1px solid #eee; display: flex; gap: 10px; }
-.input-area input { flex: 1; padding: 12px 16px; border: 2px solid #e0d8d0; border-radius: 24px; font-size: 15px; outline: none; transition: border-color .2s; }
-.input-area input:focus { border-color: #3d7a63; }
-.input-area button { padding: 10px 24px; background: #3d7a63; color: #fff; border: none; border-radius: 24px; font-size: 15px; cursor: pointer; transition: background .2s; }
-.input-area button:hover { background: #2d5a4b; }
-.input-area button:disabled { background: #ccc; cursor: not-allowed; }
+:root{--safe-bottom:env(safe-area-inset-bottom,0px);--g:#3d7a63;--gd:#2d5a4b;--bg:#f5f0eb}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--bg);color:#333;min-height:100dvh}
 
-.msg { max-width: 85%; padding: 12px 16px; border-radius: 12px; line-height: 1.6; font-size: 14px; white-space: pre-wrap; word-break: break-word; }
-.msg.user { align-self: flex-end; background: #3d7a63; color: #fff; }
-.msg.ai { align-self: flex-start; background: #f0ebe3; color: #333; }
-.msg.system { align-self: center; background: #fff3cd; color: #856404; font-size: 13px; max-width: 95%; }
-.msg.supervision { align-self: flex-start; background: #e8f0fe; border-left: 4px solid #3d7a63; color: #1a3a5c; }
+/* Header */
+.header{background:linear-gradient(135deg,var(--gd) 0%,var(--g) 100%);color:#fff;padding:10px 14px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 2px 8px rgba(0,0,0,.15);position:sticky;top:0;z-index:50}
+.header h1{font-size:17px;font-weight:600}
+.header p{font-size:11px;opacity:.8}
+.hdr-btns{display:flex;gap:6px}
+.hdr-btn{background:rgba(255,255,255,.2);color:#fff;border:1px solid rgba(255,255,255,.3);padding:7px 12px;border-radius:18px;font-size:13px;cursor:pointer;white-space:nowrap}
+.hamburger{display:none;font-size:24px;background:none;border:none;color:#fff;cursor:pointer;padding:4px 8px;line-height:1}
 
-select, .btn { width: 100%; padding: 10px 14px; border: 2px solid #e0d8d0; border-radius: 8px; font-size: 14px; margin-bottom: 12px; background: #fff; cursor: pointer; }
-.btn { background: #3d7a63; color: #fff; border: none; text-align: center; font-weight: 600; }
-.btn:hover { background: #2d5a4b; }
-.btn.outline { background: #fff; color: #3d7a63; border: 2px solid #3d7a63; }
-.btn.small { width: auto; padding: 6px 14px; font-size: 13px; margin: 0 4px 4px 0; }
+/* Layout */
+.container{max-width:1200px;margin:0 auto;display:flex;height:calc(100dvh - 52px);position:relative}
+.sidebar{width:320px;flex-shrink:0;background:#fff;padding:14px;overflow-y:auto;border-right:1px solid #eee;transition:transform .25s}
+.main{flex:1;display:flex;flex-direction:column;background:#fff;min-width:0}
+.sidebar-backdrop{display:none}
 
-.label { font-size: 13px; font-weight: 600; color: #666; margin-bottom: 4px; display: block; }
-.section-title { font-size: 14px; font-weight: 700; color: #2d5a4b; margin: 16px 0 8px; padding-bottom: 4px; border-bottom: 1px solid #e0d8d0; }
+/* Chat */
+.chat-box{flex:1;padding:12px;overflow-y:auto;display:flex;flex-direction:column;gap:10px;-webkit-overflow-scrolling:touch}
+.input-area{padding:10px 10px calc(10px + var(--safe-bottom));border-top:1px solid #eee;display:flex;gap:8px;background:#fff;position:sticky;bottom:0}
+.input-area input{flex:1;padding:12px 16px;border:2px solid #e0d8d0;border-radius:24px;font-size:16px;outline:none;min-width:0}
+.input-area input:focus{border-color:var(--g)}
+.input-area button{padding:10px 18px;background:var(--g);color:#fff;border:none;border-radius:24px;font-size:15px;cursor:pointer;white-space:nowrap}
+.input-area button:active{background:var(--gd)}
+.input-area button:disabled{background:#ccc;cursor:not-allowed}
 
-.modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,.5); z-index: 100; justify-content: center; align-items: center; }
-.modal.show { display: flex; }
-.modal-inner { background: #fff; border-radius: 16px; padding: 32px; max-width: 480px; width: 90%; }
-.modal-inner input { width: 100%; padding: 12px; border: 2px solid #e0d8d0; border-radius: 8px; font-size: 14px; margin: 8px 0 16px; }
-.modal-inner h3 { margin-bottom: 8px; }
+/* Messages */
+.msg{max-width:88%;padding:11px 13px;border-radius:12px;line-height:1.6;font-size:15px;white-space:pre-wrap;word-break:break-word}
+.msg.user{align-self:flex-end;background:var(--g);color:#fff;border-bottom-right-radius:4px}
+.msg.ai{align-self:flex-start;background:#f0ebe3;color:#333;border-bottom-left-radius:4px}
+.msg.system{align-self:center;background:#fff3cd;color:#856404;font-size:12px;max-width:95%;text-align:center;border-radius:8px}
+.msg.supervision{align-self:flex-start;background:#e8f0fe;border-left:4px solid var(--g);color:#1a3a5c;max-width:92%}
 
-.api-warning { background: #fff3cd; color: #856404; padding: 10px 14px; border-radius: 8px; font-size: 13px; margin-bottom: 12px; }
+/* Form */
+select{width:100%;padding:11px 14px;border:2px solid #e0d8d0;border-radius:10px;font-size:14px;margin-bottom:8px;background:#fff;cursor:pointer;-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:32px}
+.btn{width:100%;padding:12px 14px;border:none;border-radius:10px;font-size:14px;margin-bottom:6px;background:var(--g);color:#fff;cursor:pointer;font-weight:600;text-align:center}
+.btn:active{background:var(--gd)}
+.btn.outline{background:#fff;color:var(--g);border:2px solid var(--g)}
+.btn.small{width:auto;padding:6px 12px;font-size:12px;margin:0 4px 4px 0;display:inline-block}
+.label{font-size:12px;font-weight:600;color:#666;margin:4px 0;display:block}
+.sec-title{font-size:13px;font-weight:700;color:var(--gd);margin:12px 0 6px;padding-bottom:4px;border-bottom:1px solid #e0d8d0}
+.act-row{display:grid;grid-template-columns:1fr 1fr;gap:5px}
+.act-row .btn{margin-bottom:0;font-size:12px;padding:9px 6px}
 
-.typing { display: flex; gap: 4px; padding: 12px 16px; }
-.typing span { width: 8px; height: 8px; border-radius: 50%; background: #ccc; animation: bounce 1.4s infinite; }
-.typing span:nth-child(2) { animation-delay: .2s; }
-.typing span:nth-child(3) { animation-delay: .4s; }
-@keyframes bounce { 0%,60%,100% { transform: translateY(0); } 30% { transform: translateY(-8px); } }
+/* Modal */
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;justify-content:center;align-items:flex-end;padding:0}
+.modal.show{display:flex}
+.modal-inner{background:#fff;border-radius:14px 14px 0 0;padding:22px 16px calc(22px + var(--safe-bottom));width:100%;max-height:85vh;overflow-y:auto}
+@media(min-width:769px){.modal{align-items:center}.modal-inner{border-radius:14px;max-width:480px;width:90%;max-height:80vh;padding:28px}}
+.modal-inner input,.modal-inner select{width:100%;padding:11px;border:2px solid #e0d8d0;border-radius:8px;font-size:14px;margin:4px 0 10px}
+.modal-inner h3{margin-bottom:6px;font-size:17px}
+.api-warning{background:#fff3cd;color:#856404;padding:8px 12px;border-radius:8px;font-size:12px;margin-bottom:8px}
+.typing{display:flex;gap:4px;padding:10px 14px}
+.typing span{width:7px;height:7px;border-radius:50%;background:#ccc;animation:bounce 1.4s infinite}
+.typing span:nth-child(2){animation-delay:.2s}.typing span:nth-child(3){animation-delay:.4s}
+@keyframes bounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-7px)}}
+.history-item{padding:10px 12px;border-bottom:1px solid #eee;cursor:pointer;display:flex;justify-content:space-between;align-items:center}
 
-@media (max-width: 768px) { .container { flex-direction: column; } .sidebar { width: 100%; max-height: 280px; } }
+/* Mobile */
+@media(max-width:768px){
+  .hamburger{display:block}
+  .header p{display:none}
+  .container{padding:0}
+  .sidebar{position:fixed;top:0;left:0;width:290px;height:100dvh;z-index:150;transform:translateX(-100%);box-shadow:4px 0 20px rgba(0,0,0,.25);border-radius:0;padding:16px}
+  .sidebar.open{transform:translateX(0)}
+  .sidebar-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:149}
+  .sidebar-backdrop.show{display:block}
+  .main{border-radius:0}
+  .chat-box{padding:10px}
+  .msg{font-size:15px;max-width:92%}
+  .msg.system{font-size:12px}
+}
 </style>
 </head>
 <body>
 <div class="header">
-  <div>
+  <button class="hamburger" onclick="toggleSidebar()" aria-label="菜单">☰</button>
+  <div style="flex:1;text-align:center">
     <h1>心理咨询新手练习平台</h1>
-    <p>基于「打牢心理咨询必备基本功」课程 · 39项核心技术</p>
+    <p>39项核心技术 · AI督导反馈</p>
   </div>
-  <button class="btn small outline" onclick="toggleSettings()" style="width:auto;">⚙️ 设置</button>
+  <div class="hdr-btns">
+    <button class="hdr-btn" onclick="toggleSettings()">⚙️</button>
+    <button class="hdr-btn" onclick="toggleHistory()">📋</button>
+  </div>
 </div>
 
 <div class="container">
-  <div class="sidebar">
-    <div id="apiWarning" class="api-warning" style="display:none">⚠️ 请先设置API Key</div>
-
+  <div class="sidebar-backdrop" id="sidebarBackdrop" onclick="toggleSidebar()"></div>
+  <div class="sidebar" id="sidebar">
+    <div id="apiWarning" class="api-warning" style="display:none">⚠️ 请先设置 API Key（支持 DeepSeek/OpenAI）</div>
     <span class="label">🎯 选择技术</span>
     <select id="techniqueSelect" onchange="onTechniqueChange()">
       <optgroup label="— 基础入门 —">
-        <option value="01">技术练习流程示范</option>
-        <option value="02">什么是心理咨询</option>
-        <option value="03">有效的咨询师特质（上）</option>
-        <option value="04">有效的咨询师特质（下）</option>
-        <option value="05">如何学习咨询技能</option>
+        <option value="01">技术练习流程示范</option><option value="02">什么是心理咨询</option><option value="03">有效的咨询师特质（上）</option><option value="04">有效的咨询师特质（下）</option><option value="05">如何学习咨询技能</option>
       </optgroup>
       <optgroup label="— 初始访谈 —">
-        <option value="06">初始访谈（1）</option>
-        <option value="07">初始访谈（2）</option>
-        <option value="08">初始访谈（3）</option>
-        <option value="09">初始访谈（4）</option>
+        <option value="06">初始访谈（1）</option><option value="07">初始访谈（2）</option><option value="08">初始访谈（3）</option><option value="09">初始访谈（4）</option>
       </optgroup>
       <optgroup label="— 危机评估 —">
-        <option value="10">自杀评估（上）</option>
-        <option value="11">自杀评估（下）</option>
+        <option value="10">自杀评估（上）</option><option value="11">自杀评估（下）</option>
       </optgroup>
       <optgroup label="— 观察倾听 —">
-        <option value="12">观察技巧（上）</option>
-        <option value="13">观察技巧（下）</option>
-        <option value="14">倾听技巧（上）</option>
-        <option value="15">倾听技巧（下）</option>
+        <option value="12">观察技巧（上）</option><option value="13">观察技巧（下）</option><option value="14">倾听技巧（上）</option><option value="15">倾听技巧（下）</option>
       </optgroup>
       <optgroup label="— 个案概念化 —">
-        <option value="16">个案概念化（上）</option>
-        <option value="17">个案概念化（下）</option>
+        <option value="16">个案概念化（上）</option><option value="17">个案概念化（下）</option>
       </optgroup>
       <optgroup label="— 澄清技术 —">
-        <option value="18">澄清技巧（上）</option>
-        <option value="19">澄清技巧（下）</option>
+        <option value="18">澄清技巧（上）</option><option value="19">澄清技巧（下）</option>
       </optgroup>
       <optgroup label="— 目标与计划 —">
-        <option value="20">如何制定目标（上）</option>
-        <option value="21">如何制定目标（下）</option>
-        <option value="22">咨询计划</option>
+        <option value="20">如何制定目标（上）</option><option value="21">如何制定目标（下）</option><option value="22">咨询计划</option>
       </optgroup>
       <optgroup label="— 阻抗处理 —">
-        <option value="23">阻抗现象（上）</option>
-        <option value="24">阻抗现象（下）</option>
+        <option value="23">阻抗现象（上）</option><option value="24">阻抗现象（下）</option>
       </optgroup>
       <optgroup label="— 核心技术 —">
-        <option value="25">情感反映技术</option>
-        <option value="26">简述语意技术</option>
-        <option value="27">具体化技术</option>
-        <option value="28" selected>共情技术</option>
+        <option value="25">情感反映技术</option><option value="26">简述语意技术</option><option value="27">具体化技术</option><option value="28" selected>共情技术</option>
       </optgroup>
       <optgroup label="— 辅助技术 —">
-        <option value="29">复述技术</option>
-        <option value="30">沉默技术</option>
-        <option value="31">摘要技术</option>
+        <option value="29">复述技术</option><option value="30">沉默技术</option><option value="31">摘要技术</option>
       </optgroup>
       <optgroup label="— 结构化 —">
-        <option value="32">结构化技术（上）</option>
-        <option value="33">结构化技术（下）</option>
+        <option value="32">结构化技术（上）</option><option value="33">结构化技术（下）</option>
       </optgroup>
       <optgroup label="— 提问技术 —">
         <option value="34">提问技术</option>
       </optgroup>
       <optgroup label="— 进阶技术 —">
-        <option value="35">立即性技术</option>
-        <option value="36">面质技术</option>
-        <option value="37">自我表露技术</option>
-        <option value="38">信息提供技术</option>
+        <option value="35">立即性技术</option><option value="36">面质技术</option><option value="37">自我表露技术</option><option value="38">信息提供技术</option>
       </optgroup>
       <optgroup label="— 结束技术 —">
         <option value="39">结束技术</option>
@@ -139,64 +145,59 @@ select, .btn { width: 100%; padding: 10px 14px; border: 2px solid #e0d8d0; borde
 
     <span class="label">🎭 练习模式</span>
     <select id="modeSelect" onchange="onModeChange()">
-      <option value="client">我当来访者（AI演示技术）</option>
-      <option value="counselor">我当咨询师（AI观察+督导）</option>
+      <option value="client">我当来访者（AI演示）</option>
+      <option value="counselor">我当咨询师（AI督导）</option>
     </select>
 
     <span class="label">📋 预设场景</span>
-    <select id="scenarioSelect" onchange="onScenarioChange()">
-      <option value="">— 自定义场景 —</option>
-      <option value="marriage">婚姻困扰（35岁男，妻子要离婚）</option>
-      <option value="work">职场压力（28岁女，新晋管理者焦虑）</option>
-      <option value="student">大学生适应（22岁，成绩下滑）</option>
-      <option value="affair">婚姻危机（42岁女，怀疑丈夫出轨）</option>
-      <option value="suicide">自杀风险（19岁大学生）</option>
-      <option value="loss">丧失创伤（55岁男，丧妻后抑郁）</option>
-      <option value="silent">沉默来访者（第一次咨询）</option>
-      <option value="parent">亲子冲突（38岁母亲vs女儿）</option>
-      <option value="office">职场人际（26岁程序员，被排挤感）</option>
-      <option value="resistance">阻抗场景（40岁女，被逼来咨询）</option>
-      <option value="ending">咨询结束（32岁男，20次后好转）</option>
+    <select id="scenarioSelect">
+      <option value="">— 自定义 —</option>
+      <option value="marriage">婚姻困扰（妻子要离婚）</option>
+      <option value="work">职场压力（新晋管理者焦虑）</option>
+      <option value="student">大学生适应（成绩下滑）</option>
+      <option value="affair">婚姻危机（怀疑丈夫出轨）</option>
+      <option value="suicide">自杀风险（大学生）</option>
+      <option value="loss">丧失创伤（丧妻后抑郁）</option>
+      <option value="silent">沉默来访者</option>
+      <option value="parent">亲子冲突</option>
+      <option value="office">职场人际</option>
+      <option value="resistance">阻抗场景（被逼来咨询）</option>
+      <option value="ending">咨询结束</option>
     </select>
 
     <button class="btn" onclick="startPractice()">▶ 开始练习</button>
-    <button class="btn outline" onclick="requestFeedback()" id="feedbackBtn" disabled>📝 请求督导反馈</button>
-    <button class="btn outline" onclick="saveHistory()" id="saveBtn" disabled>💾 保存对话</button>
-    <button class="btn outline" onclick="resetChat()">🔄 重置对话</button>
-    <button class="btn outline" onclick="toggleHistory()">📋 历史记录</button>
-
-    <div id="historyList" style="display:none;margin-top:8px;max-height:200px;overflow-y:auto;font-size:12px;"></div>
-
-    <div class="section-title">ℹ️ 使用说明</div>
-    <p style="font-size:12px;color:#888;line-height:1.6">
-      <b>模式1</b>：AI扮演资深咨询师演示技术。<br>
-      <b>模式2</b>：AI扮演来访者，练习后点"督导反馈"获取建议。<br>
-      需要自行提供OpenAI兼容的API Key。
-    </p>
+    <div class="act-row">
+      <button class="btn outline" onclick="requestFeedback()" id="feedbackBtn" disabled>📝 督导反馈</button>
+      <button class="btn outline" onclick="saveHistory()" id="saveBtn" disabled>💾 保存</button>
+      <button class="btn outline" onclick="resetChat()">🔄 重置</button>
+    </div>
+    <div id="historyList" style="display:none;margin-top:6px;max-height:200px;overflow-y:auto;font-size:12px"></div>
   </div>
 
   <div class="main">
     <div class="chat-box" id="chatBox">
-      <div class="msg system">欢迎来到心理咨询练习平台 👋<br>请选择技术和模式后点击「开始练习」</div>
+      <div class="msg system">👋 欢迎！选择技术和模式后点击「开始练习」</div>
     </div>
     <div class="input-area">
-      <input type="text" id="userInput" placeholder="输入你的回应..." onkeydown="if(event.key==='Enter')sendMessage()">
+      <input type="text" id="userInput" placeholder="输入你的回应…" onkeydown="if(event.key==='Enter')sendMessage()">
       <button onclick="sendMessage()" id="sendBtn" disabled>发送</button>
     </div>
   </div>
 </div>
 
 <script src="transcripts_kb.js"></script>
+
+<!-- Settings Modal -->
 <div class="modal" id="settingsModal">
   <div class="modal-inner">
     <h3>⚙️ 设置</h3>
-    <span class="label">API Base URL（OpenAI兼容）</span>
-    <input id="apiBase" placeholder="https://api.openai.com/v1" value="https://api.openai.com/v1">
+    <span class="label">API Base URL</span>
+    <input id="apiBase" placeholder="https://api.deepseek.com/v1">
     <span class="label">API Key</span>
     <input id="apiKey" type="password" placeholder="sk-...">
-    <span class="label">模型名称</span>
-    <input id="modelName" placeholder="gpt-4o" value="gpt-4o">
-    <p style="font-size:12px;color:#888;margin:4px 0 16px">支持任何OpenAI兼容API（OpenAI / DeepSeek / 通义千问 等）</p>
+    <span class="label">模型</span>
+    <input id="modelName" placeholder="deepseek-chat" value="deepseek-chat">
+    <p style="font-size:11px;color:#888;margin:4px 0 12px">支持 OpenAI / DeepSeek / 通义千问 等兼容接口</p>
     <div style="display:flex;gap:8px">
       <button class="btn" onclick="saveSettings()" style="flex:1">保存</button>
       <button class="btn outline" onclick="toggleSettings()" style="flex:1">取消</button>
@@ -204,11 +205,12 @@ select, .btn { width: 100%; padding: 10px 14px; border: 2px solid #e0d8d0; borde
   </div>
 </div>
 
+<!-- History Modal -->
 <div class="modal" id="historyModal">
-  <div class="modal-inner" style="max-width:700px;max-height:80vh;overflow-y:auto;">
+  <div class="modal-inner" style="max-width:700px">
     <h3>📋 历史记录</h3>
-    <div id="historyDetail" style="font-size:13px;max-height:55vh;overflow-y:auto;"></div>
-    <div style="display:flex;gap:8px;margin-top:12px">
+    <div id="historyDetail" style="font-size:13px;max-height:50vh;overflow-y:auto"></div>
+    <div style="display:flex;gap:8px;margin-top:10px">
       <button class="btn outline" onclick="exportHistory()" style="flex:1">📥 导出全部</button>
       <button class="btn" onclick="document.getElementById('historyModal').classList.remove('show')" style="flex:1">关闭</button>
     </div>
@@ -218,7 +220,7 @@ select, .btn { width: 100%; padding: 10px 14px; border: 2px solid #e0d8d0; borde
 <script>
 // ==================== State ====================
 let mode = 'client';
-let technique = null;
+let technique = '28';
 let messages = [];
 let isActive = false;
 let turnCount = 0;
@@ -230,16 +232,10 @@ const savedModel = localStorage.getItem('counseling_model') || 'deepseek-chat';
 document.getElementById('apiKey').value = savedApiKey;
 document.getElementById('apiBase').value = savedApiBase;
 document.getElementById('modelName').value = savedModel;
-
-if (!savedApiKey) {
-  document.getElementById('apiWarning').style.display = 'block';
-}
+if (!savedApiKey) document.getElementById('apiWarning').style.display = 'block';
 
 // ==================== Settings ====================
-function toggleSettings() {
-  document.getElementById('settingsModal').classList.toggle('show');
-}
-
+function toggleSettings() { document.getElementById('settingsModal').classList.toggle('show'); }
 function saveSettings() {
   const key = document.getElementById('apiKey').value.trim();
   const base = document.getElementById('apiBase').value.trim();
@@ -250,6 +246,16 @@ function saveSettings() {
   document.getElementById('settingsModal').classList.remove('show');
   document.getElementById('apiWarning').style.display = key ? 'none' : 'block';
   addSystemMsg('✅ 设置已保存');
+}
+
+// ==================== Sidebar (mobile) ====================
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('sidebarBackdrop').classList.toggle('show');
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebarBackdrop').classList.remove('show');
 }
 
 // ==================== Technique Data ====================
@@ -266,141 +272,78 @@ const techniqueNames = {
 };
 
 const scenarioPrompts = {
-  'marriage': { label: '婚姻困扰', clientInfo: '你是一个35岁的已婚男性，结婚6年，孩子4岁。妻子最近提出离婚，说你不关心她。你觉得很委屈——你努力工作养家，还买了昂贵的真皮沙发，但妻子不领情。你怀疑妻子可能有了外遇，但又不想离婚。', counselorGoal: '探索来访者的真实感受，帮助他看到问题可能不仅仅是沙发，而是关系中长期积累的沟通问题。使用共情和情感反映技术。' },
-  'work': { label: '职场压力', clientInfo: '你是一个28岁的女性互联网产品经理，最近刚被晋升为团队主管，管理5个人。你最近半年失眠、焦虑，担心自己能力不够，怕被下属看不起。你觉得自己是"运气好"才被晋升的。', counselorGoal: '帮助来访者识别"冒充者综合征"，探索她的完美主义倾向。使用倾听和共情技术。' },
-  'student': { label: '大学生适应', clientInfo: '你是一个22岁的大学生，被辅导员建议来咨询。这学期成绩明显下滑，从班级前十掉到挂科两门。你不太想说话，不确定心理咨询能不能帮到自己。你觉得可能是自己太懒了。', counselorGoal: '这是一个非自愿来访者。先解释咨询是什么，建立安全感。使用初始访谈和结构化技术。' },
-  'affair': { label: '婚姻危机', clientInfo: '你是一个42岁的已婚女性，怀疑丈夫出轨。最近三个月情绪低落、食欲下降、经常哭泣。你不确定是想挽救婚姻还是想离婚。来咨询想"理清思路"。最近睡眠也很差，有时候觉得活着很累。', counselorGoal: '注意评估抑郁程度和安全风险。使用倾听技术让来访者充分表达。' },
-  'suicide': { label: '自杀风险', clientInfo: '你是一个19岁的大学生，最近两周持续情绪低落，说"活着没意思"。室友发现你在阳台发呆很久，带你来的。你否认有具体计划，但承认"有时候想如果消失了会不会更好"。你觉得没人理解你。', counselorGoal: '必须直接询问自杀意念、计划、方法、时机。同时建立信任关系。使用自杀评估和共情技术。' },
-  'loss': { label: '丧失创伤', clientInfo: '你是一个55岁的男性，三个月前妻子因癌症去世。最近经常一个人喝酒，说"想去找她"。女儿很担心带你来咨询。你觉得活着没意义了，孩子都大了，不需要你了。', counselorGoal: '评估自杀风险，探索丧亲后的复杂哀伤。使用共情和情感反映技术。' },
-  'silent': { label: '沉默来访者', clientInfo: '你是一个30岁的男性，第一次来咨询。你坐下后一直低着头，双手紧握，偶尔抬眼看一下咨询师又迅速移开。咨询师问你为什么来，你沉默了很久才小声说"我也不知道"。你其实因为工作压力太大，但不好意思说。', counselorGoal: '注意非言语信息。给来访者空间，不要急于填补沉默。使用观察技巧和沉默技术。' },
-  'parent': { label: '亲子冲突', clientInfo: '你是一个38岁的母亲，和15岁女儿关系紧张。女儿说你"控制欲太强"，你觉得女儿"不懂感恩"。昨天因为女儿晚归两小时，你打了她一巴掌，女儿跑去了外婆家。你又生气又愧疚。', counselorGoal: '来访者同时有愤怒和愧疚。帮助她看到自己的情绪，探索控制欲背后的恐惧。使用共情、情感反映和面质技术。' },
-  'office': { label: '职场人际', clientInfo: '你是一个26岁的男性程序员，认为同事都在排挤你。开会时没人支持你的方案，午餐也没人叫你。你说"这个环境有毒"，想辞职。但你已经换了三份工作，都是同样的情况。你觉得可能是自己性格太内向。', counselorGoal: '注意来访者可能存在的认知偏差和人际模式。使用面质、具体化和提问技术。' },
-  'resistance': { label: '阻抗场景', clientInfo: '你是一个40岁的女性，被丈夫要求来咨询，说你"脾气太大了"。你一进来就说："我觉得我没问题，是他太懦弱了。你们心理咨询不就是骗钱的吗？"但其实你内心深处也有点担心是不是自己真的有问题。', counselorGoal: '不要防御，先接纳她的愤怒。使用阻抗处理和立即性技术。' },
-  'ending': { label: '咨询结束', clientInfo: '你是一个32岁的男性，已经做了20次咨询，症状明显改善。最近三次你都在聊日常琐事，似乎有意回避深度话题。你其实有点担心结束咨询后会复发。', counselorGoal: '处理分离焦虑，评估是否真的准备好结束。使用结束技术、摘要和立即性。' }
+  'marriage':{label:'婚姻困扰',clientInfo:'你是一个35岁的已婚男性，结婚6年，孩子4岁。妻子最近提出离婚，说你不关心她。你觉得很委屈——你努力工作养家，还买了昂贵的真皮沙发，但妻子不领情。你怀疑妻子可能有了外遇，但又不想离婚。',counselorGoal:'探索来访者的真实感受，帮助他看到问题可能不仅仅是沙发，而是关系中长期积累的沟通问题。使用共情和情感反映技术。'},
+  'work':{label:'职场压力',clientInfo:'你是一个28岁的女性互联网产品经理，最近刚被晋升为团队主管，管理5个人。你最近半年失眠、焦虑，担心自己能力不够，怕被下属看不起。你觉得自己是"运气好"才被晋升的。',counselorGoal:'帮助来访者识别"冒充者综合征"，探索她的完美主义倾向。使用倾听和共情技术。'},
+  'student':{label:'大学生适应',clientInfo:'你是一个22岁的大学生，被辅导员建议来咨询。这学期成绩明显下滑，从班级前十掉到挂科两门。你不太想说话，不确定心理咨询能不能帮到自己。你觉得可能是自己太懒了。',counselorGoal:'这是一个非自愿来访者。先解释咨询是什么，建立安全感。使用初始访谈和结构化技术。'},
+  'affair':{label:'婚姻危机',clientInfo:'你是一个42岁的已婚女性，怀疑丈夫出轨。最近三个月情绪低落、食欲下降、经常哭泣。你不确定是想挽救婚姻还是想离婚。来咨询想"理清思路"。最近睡眠也很差，有时候觉得活着很累。',counselorGoal:'注意评估抑郁程度和安全风险。使用倾听技术让来访者充分表达。'},
+  'suicide':{label:'自杀风险',clientInfo:'你是一个19岁的大学生，最近两周持续情绪低落，说"活着没意思"。室友发现你在阳台发呆很久，带你来的。你否认有具体计划，但承认"有时候想如果消失了会不会更好"。你觉得没人理解你。',counselorGoal:'必须直接询问自杀意念、计划、方法、时机。同时建立信任关系。使用自杀评估和共情技术。'},
+  'loss':{label:'丧失创伤',clientInfo:'你是一个55岁的男性，三个月前妻子因癌症去世。最近经常一个人喝酒，说"想去找她"。女儿很担心带你来咨询。你觉得活着没意义了，孩子都大了，不需要你了。',counselorGoal:'评估自杀风险，探索丧亲后的复杂哀伤。使用共情和情感反映技术。'},
+  'silent':{label:'沉默来访者',clientInfo:'你是一个30岁的男性，第一次来咨询。你坐下后一直低着头，双手紧握，偶尔抬眼看一下咨询师又迅速移开。咨询师问你为什么来，你沉默了很久才小声说"我也不知道"。你其实因为工作压力太大，但不好意思说。',counselorGoal:'注意非言语信息。给来访者空间，不要急于填补沉默。使用观察技巧和沉默技术。'},
+  'parent':{label:'亲子冲突',clientInfo:'你是一个38岁的母亲，和15岁女儿关系紧张。女儿说你"控制欲太强"，你觉得女儿"不懂感恩"。昨天因为女儿晚归两小时，你打了她一巴掌，女儿跑去了外婆家。你又生气又愧疚。',counselorGoal:'来访者同时有愤怒和愧疚。帮助她看到自己的情绪，探索控制欲背后的恐惧。使用共情、情感反映和面质技术。'},
+  'office':{label:'职场人际',clientInfo:'你是一个26岁的男性程序员，认为同事都在排挤你。开会时没人支持你的方案，午餐也没人叫你。你说"这个环境有毒"，想辞职。但你已经换了三份工作，都是同样的情况。你觉得可能是自己性格太内向。',counselorGoal:'注意来访者可能存在的认知偏差和人际模式。使用面质、具体化和提问技术。'},
+  'resistance':{label:'阻抗场景',clientInfo:'你是一个40岁的女性，被丈夫要求来咨询，说你"脾气太大了"。你一进来就说："我觉得我没问题，是他太懦弱了。你们心理咨询不就是骗钱的吗？"但其实你内心深处也有点担心是不是自己真的有问题。',counselorGoal:'不要防御，先接纳她的愤怒。使用阻抗处理和立即性技术。'},
+  'ending':{label:'咨询结束',clientInfo:'你是一个32岁的男性，已经做了20次咨询，症状明显改善。最近三次你都在聊日常琐事，似乎有意回避深度话题。你其实有点担心结束咨询后会复发。',counselorGoal:'处理分离焦虑，评估是否真的准备好结束。使用结束技术、摘要和立即性。'}
 };
 
 // ==================== UI ====================
-function onTechniqueChange() {
-  technique = document.getElementById('techniqueSelect').value;
-}
-
-function onModeChange() {
+function onTechniqueChange(){ technique = document.getElementById('techniqueSelect').value; }
+function onModeChange(){
   mode = document.getElementById('modeSelect').value;
-  const fbBtn = document.getElementById('feedbackBtn');
-  fbBtn.style.display = mode === 'counselor' ? 'block' : 'none';
+  document.getElementById('feedbackBtn').style.display = mode === 'counselor' ? '' : 'none';
 }
 
-function onScenarioChange() {
-  // Just stores the selection, used when starting
-}
-
-function addMsg(role, text, className) {
+function addMsg(role, text, className){
   const div = document.createElement('div');
   div.className = 'msg ' + (className || role);
   div.textContent = text;
   document.getElementById('chatBox').appendChild(div);
   document.getElementById('chatBox').scrollTop = document.getElementById('chatBox').scrollHeight;
 }
-
-function addSystemMsg(text) {
-  addMsg('system', text, 'system');
-}
-
-function addTyping() {
+function addSystemMsg(text){ addMsg('system', text, 'system'); }
+function addTyping(){
   const div = document.createElement('div');
-  div.className = 'typing';
-  div.id = 'typingIndicator';
+  div.className = 'typing'; div.id = 'typingIndicator';
   div.innerHTML = '<span></span><span></span><span></span>';
   document.getElementById('chatBox').appendChild(div);
   document.getElementById('chatBox').scrollTop = document.getElementById('chatBox').scrollHeight;
 }
-
-function removeTyping() {
-  const el = document.getElementById('typingIndicator');
-  if (el) el.remove();
-}
-
-function setInputEnabled(enabled) {
+function removeTyping(){ const el = document.getElementById('typingIndicator'); if(el) el.remove(); }
+function setInputEnabled(enabled){
   document.getElementById('sendBtn').disabled = !enabled;
   document.getElementById('userInput').disabled = !enabled;
   document.getElementById('feedbackBtn').disabled = !enabled || mode !== 'counselor';
   document.getElementById('saveBtn').disabled = !enabled || messages.length < 2;
 }
 
-function saveHistorySilent() {
-  if (messages.length < 2) return;
-  const history = getHistory();
-  const record = {
-    id: Date.now(),
-    date: new Date().toLocaleString('zh-CN'),
-    technique: techniqueNames[technique] || '未选择',
-    mode: mode === 'client' ? '来访者模式' : '咨询师模式',
-    messages: [...messages],
-    turnCount: turnCount
-  };
-  history.unshift(record);
-  if (history.length > 50) history.length = 50;
-  localStorage.setItem('counseling_history', JSON.stringify(history));
-  renderHistoryList();
-}
-
 // ==================== API ====================
-async function callLLM(systemPrompt, userMessage) {
+async function callLLM(systemPrompt, userMessage){
   const apiKey = localStorage.getItem('counseling_api_key');
-  const apiBase = localStorage.getItem('counseling_api_base') || 'https://api.openai.com/v1';
-  const model = localStorage.getItem('counseling_model') || 'gpt-4o';
+  const apiBase = localStorage.getItem('counseling_api_base') || 'https://api.deepseek.com/v1';
+  const model = localStorage.getItem('counseling_model') || 'deepseek-chat';
+  if (!apiKey) { addSystemMsg('❌ 请先在设置中配置API Key'); return null; }
 
-  if (!apiKey) {
-    addSystemMsg('❌ 请先在设置中配置API Key（支持OpenAI兼容接口）');
-    return null;
-  }
-
-  const allMessages = [
-    { role: 'system', content: systemPrompt },
-    ...messages,
-    { role: 'user', content: userMessage }
-  ];
-
+  const allMessages = [{ role: 'system', content: systemPrompt }, ...messages, { role: 'user', content: userMessage }];
   try {
     const resp = await fetch(`${apiBase}/chat/completions`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`
-      },
-      body: JSON.stringify({
-        model: model,
-        messages: allMessages,
-        temperature: 0.8,
-        max_tokens: 2000
-      })
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
+      body: JSON.stringify({ model, messages: allMessages, temperature: 0.8, max_tokens: 2000 })
     });
-
-    if (!resp.ok) {
-      const err = await resp.text();
-      throw new Error(`API error ${resp.status}: ${err.substring(0, 200)}`);
-    }
-
+    if (!resp.ok) { const err = await resp.text(); throw new Error(`API error ${resp.status}: ${err.substring(0,200)}`); }
     const data = await resp.json();
     return data.choices[0].message.content;
-  } catch (e) {
-    addSystemMsg(`❌ API调用失败: ${e.message}`);
-    return null;
-  }
+  } catch(e) { addSystemMsg(`❌ API调用失败: ${e.message}`); return null; }
 }
 
-// ==================== Practice Logic ====================
-function buildSystemPrompt() {
+// ==================== Practice ====================
+function buildSystemPrompt(){
   const techName = techniqueNames[technique] || '共情技术';
   const scenarioKey = document.getElementById('scenarioSelect').value;
   const scenario = scenarioPrompts[scenarioKey];
 
-  // Load the relevant transcript knowledge
   let transcriptKnowledge = '';
   if (window.TRANSCRIPT_KB && window.TRANSCRIPT_KB[technique]) {
-    const raw = window.TRANSCRIPT_KB[technique];
-    // Take first 4000 chars as context (enough for teaching points)
-    transcriptKnowledge = raw.substring(0, 4000);
+    transcriptKnowledge = window.TRANSCRIPT_KB[technique].substring(0, 4000);
   }
 
   let prompt = `你是一个心理咨询练习平台，基于「打牢心理咨询必备基本功」课程。当前练习技术：${techName}。
@@ -418,12 +361,10 @@ ${transcriptKnowledge}
 `;
 
   if (mode === 'client') {
-    // AI plays the counselor demonstrating the technique
     prompt += `当前模式：用户扮演来访者，你扮演资深咨询师展示「${techName}」技术。
 
 你的角色：你是一位有15年经验的资深心理咨询师，正在向来访者展示「${techName}」。用这个技术与来访者对话，展现该技术的核心要点。在对话自然结束后（约5-8轮），简要总结你用了哪些具体的技术手法。`;
   } else {
-    // AI plays the client + supervisor
     prompt += `当前模式：用户扮演咨询师，你扮演来访者。用户正在练习「${techName}」。
 
 你的角色：你是一个真实的来访者。根据场景自然地回应咨询师。不要故意刁难，但也要真实——有时防御、有时回避、有时情绪化。
@@ -437,236 +378,153 @@ ${transcriptKnowledge}
 
   if (scenario) {
     prompt += `\n\n来访者信息：${scenario.clientInfo}`;
-    if (mode === 'client') {
-      prompt += `\n\n咨询师目标：${scenario.counselorGoal}`;
-    }
+    if (mode === 'client') prompt += `\n\n咨询师目标：${scenario.counselorGoal}`;
   }
-
   return prompt;
 }
 
-async function startPractice() {
+async function startPractice(){
   technique = document.getElementById('techniqueSelect').value;
   mode = document.getElementById('modeSelect').value;
-
-  // Reset state
-  messages = [];
-  turnCount = 0;
-  isActive = true;
+  messages = []; turnCount = 0; isActive = true;
   document.getElementById('chatBox').innerHTML = '';
   setInputEnabled(true);
+  closeSidebar();
 
   const techName = techniqueNames[technique];
-  const modeLabel = mode === 'client' ? '你当来访者，AI演示技术' : '你当咨询师，AI扮演来访者';
-  addSystemMsg(`🎯 开始练习：${techName} | ${modeLabel}`);
-  addSystemMsg('💡 输入"反馈"获取督导建议 | 输入"结束"退出练习');
+  const modeLabel = mode === 'client' ? '你当来访者，AI演示' : '你当咨询师，AI扮演来访者';
+  addSystemMsg(`🎯 ${techName} | ${modeLabel}`);
+  addSystemMsg('💡 输入"反馈"获取督导建议 | 输入"结束"退出');
 
-  const systemPrompt = buildSystemPrompt();
-
+  const sp = buildSystemPrompt();
   if (mode === 'client') {
-    // AI starts as counselor
     addTyping();
-    const firstMsg = await callLLM(systemPrompt, '你好，我准备好了，我们开始吧。');
+    const first = await callLLM(sp, '你好，我准备好了，我们开始吧。');
     removeTyping();
-    if (firstMsg) {
-      addMsg('ai', firstMsg, 'ai');
-      messages.push({ role: 'assistant', content: firstMsg });
-    }
+    if (first) { addMsg('ai', first, 'ai'); messages.push({ role: 'assistant', content: first }); }
   } else {
-    // AI starts as client
     const scenarioKey = document.getElementById('scenarioSelect').value;
     if (scenarioKey && scenarioPrompts[scenarioKey]) {
       addSystemMsg(`📋 场景：${scenarioPrompts[scenarioKey].label}`);
-      const intro = scenarioPrompts[scenarioKey].clientInfo;
-      addMsg('ai', `（来访者信息）${intro}\n\n（现在请以咨询师身份开始对话）`, 'ai');
+      addMsg('ai', `（来访者信息）${scenarioPrompts[scenarioKey].clientInfo}\n\n（请以咨询师身份开始对话）`, 'ai');
     } else {
       addTyping();
-      const intro = await callLLM(systemPrompt, '请以来访者身份开始，告诉我你的困扰。');
+      const intro = await callLLM(sp, '请以来访者身份开始，告诉我你的困扰。');
       removeTyping();
-      if (intro) {
-        addMsg('ai', intro, 'ai');
-        messages.push({ role: 'assistant', content: intro });
-      }
+      if (intro) { addMsg('ai', intro, 'ai'); messages.push({ role: 'assistant', content: intro }); }
     }
   }
 }
 
-async function sendMessage() {
+async function sendMessage(){
   if (!isActive) return;
   const input = document.getElementById('userInput');
   const text = input.value.trim();
   if (!text) return;
-
-  input.value = '';
-  addMsg('user', text, 'user');
+  input.value = ''; addMsg('user', text, 'user');
   messages.push({ role: 'user', content: text });
 
   if (text === '结束') {
     addSystemMsg('练习结束。对话已自动保存。');
-    saveHistorySilent();
-    isActive = false;
-    setInputEnabled(false);
+    saveHistorySilent(); isActive = false; setInputEnabled(false);
     return;
   }
-
   if (text === '反馈' || text === '督导') {
     addTyping();
-    messages.push({ role: 'user', content: '请给我督导反馈，按四部分格式输出：1.做得好的 2.可改进的 3.资深咨询师会怎么做 4.理论依据' });
-    const systemPrompt = buildSystemPrompt();
-    const reply = await callLLM(systemPrompt, '请给我督导反馈。');
+    messages.push({ role: 'user', content: '请给我督导反馈，按四部分格式输出' });
+    const sp = buildSystemPrompt();
+    const reply = await callLLM(sp, '请给我督导反馈。');
     removeTyping();
-    if (reply) {
-      addMsg('ai', reply, 'supervision');
-      messages.push({ role: 'assistant', content: reply });
-    }
+    if (reply) { addMsg('ai', reply, 'supervision'); messages.push({ role: 'assistant', content: reply }); }
     return;
   }
-
-  turnCount++;
-  addTyping();
-  const systemPrompt = buildSystemPrompt();
-  const reply = await callLLM(systemPrompt, text);
+  turnCount++; addTyping();
+  const sp = buildSystemPrompt();
+  const reply = await callLLM(sp, text);
   removeTyping();
-
-  if (reply) {
-    const cls = mode === 'client' ? 'ai' : 'ai';
-    addMsg('ai', reply, cls);
-    messages.push({ role: 'assistant', content: reply });
-  }
+  if (reply) { addMsg('ai', reply, 'ai'); messages.push({ role: 'assistant', content: reply }); }
 }
 
-function requestFeedback() {
-  if (!isActive || mode !== 'counselor') return;
-  document.getElementById('userInput').value = '反馈';
-  sendMessage();
-}
-
-function resetChat() {
-  messages = [];
-  turnCount = 0;
-  isActive = false;
-  document.getElementById('chatBox').innerHTML = '';
-  addSystemMsg('对话已重置。选择技术和模式后点击「开始练习」。');
-  setInputEnabled(false);
-}
+function requestFeedback(){ if (isActive && mode === 'counselor') { document.getElementById('userInput').value = '反馈'; sendMessage(); } }
+function resetChat(){ messages = []; turnCount = 0; isActive = false; document.getElementById('chatBox').innerHTML = ''; addSystemMsg('对话已重置。选择技术和模式后点击「开始练习」。'); setInputEnabled(false); }
 
 // ==================== History ====================
-function getHistory() {
-  try { return JSON.parse(localStorage.getItem('counseling_history') || '[]'); }
-  catch(e) { return []; }
-}
-
-function saveHistory() {
-  if (messages.length < 2) { addSystemMsg('💡 还没有对话内容可以保存'); return; }
+function getHistory(){ try { return JSON.parse(localStorage.getItem('counseling_history') || '[]'); } catch(e) { return []; } }
+function saveHistorySilent(){
+  if (messages.length < 2) return;
   const history = getHistory();
-  const record = {
-    id: Date.now(),
-    date: new Date().toLocaleString('zh-CN'),
-    technique: techniqueNames[technique] || '未选择',
-    mode: mode === 'client' ? '来访者模式' : '咨询师模式',
-    messages: [...messages],
-    turnCount: turnCount
-  };
-  history.unshift(record);
+  history.unshift({ id: Date.now(), date: new Date().toLocaleString('zh-CN'), technique: techniqueNames[technique]||'未选择', mode: mode==='client'?'来访者模式':'咨询师模式', messages: [...messages], turnCount });
   if (history.length > 50) history.length = 50;
   localStorage.setItem('counseling_history', JSON.stringify(history));
-  addSystemMsg('💾 对话已保存（共' + messages.length + '条消息）');
   renderHistoryList();
 }
+function saveHistory(){ if (messages.length < 2) { addSystemMsg('💡 还没有对话内容'); return; } saveHistorySilent(); addSystemMsg('💾 已保存'); }
 
-function toggleHistory() {
+function toggleHistory(){
   renderHistoryList();
   const list = document.getElementById('historyList');
   list.style.display = list.style.display === 'none' ? 'block' : 'none';
 }
-
-function renderHistoryList() {
+function renderHistoryList(){
   const history = getHistory();
   const list = document.getElementById('historyList');
-  if (history.length === 0) {
-    list.innerHTML = '<div style="color:#999;padding:8px;">暂无历史记录</div>';
-    return;
-  }
-  list.innerHTML = history.map((h, i) => {
+  if (history.length === 0) { list.innerHTML = '<div style="color:#999;padding:8px">暂无历史记录</div>'; return; }
+  list.innerHTML = history.map(h => {
     const label = h.technique + ' · ' + h.mode;
-    const preview = h.messages.slice(0, 3).map(m => m.content.substring(0, 40)).join(' | ');
-    return `<div style="padding:8px;border-bottom:1px solid #eee;cursor:pointer;display:flex;justify-content:space-between;" onclick="viewHistory(${h.id})">
-      <div><b>${label}</b><br><span style="color:#999;font-size:11px;">${h.date} · ${h.messages.length}条 · ${preview}...</span></div>
-      <button onclick="event.stopPropagation();deleteHistory(${h.id})" style="background:none;border:none;cursor:pointer;color:#c00;font-size:16px;">✕</button>
+    const preview = h.messages.slice(0,2).map(m => m.content.substring(0,30)).join(' | ');
+    return `<div class="history-item" onclick="viewHistory(${h.id})">
+      <div><b style="font-size:12px">${label}</b><br><span style="color:#999;font-size:11px">${h.date} · ${h.messages.length}条</span></div>
+      <button onclick="event.stopPropagation();deleteHistory(${h.id})" style="background:none;border:none;color:#c00;font-size:16px;cursor:pointer;padding:4px 8px">✕</button>
     </div>`;
   }).join('');
 }
-
-function viewHistory(id) {
-  const history = getHistory();
-  const record = history.find(h => h.id === id);
-  if (!record) return;
+function viewHistory(id){
+  const h = getHistory().find(x => x.id === id);
+  if (!h) return;
   document.getElementById('historyModal').classList.add('show');
-  const detail = document.getElementById('historyDetail');
-  detail.innerHTML = `<h4 style="margin-bottom:8px;">${record.technique} · ${record.mode}</h4>
-    <p style="color:#999;font-size:12px;margin-bottom:16px;">${record.date} · ${record.messages.length}条消息 · ${record.turnCount}轮对话</p>` +
-    record.messages.map(m => {
-      let cls = m.role === 'user' ? 'user' : 'ai';
-      return `<div class="msg ${cls}" style="margin-bottom:8px;font-size:13px;">${m.content}</div>`;
-    }).join('') +
-    `<div style="margin-top:12px;"><button class="btn outline small" onclick="loadHistory(${id})">📥 加载此对话继续练习</button>
-    <button class="btn outline small" onclick="deleteHistory(${id})">🗑 删除</button></div>`;
+  document.getElementById('historyDetail').innerHTML =
+    `<h4 style="margin-bottom:4px">${h.technique} · ${h.mode}</h4>
+    <p style="color:#999;font-size:11px;margin-bottom:10px">${h.date} · ${h.messages.length}条 · ${h.turnCount}轮</p>` +
+    h.messages.map(m => `<div class="msg ${m.role==='user'?'user':'ai'}" style="margin-bottom:6px;font-size:13px">${m.content}</div>`).join('') +
+    `<div style="margin-top:8px"><button class="btn outline small" onclick="loadHistory(${h.id})">📥 加载继续</button>
+    <button class="btn outline small" onclick="deleteHistory(${h.id})">🗑 删除</button></div>`;
 }
-
-function loadHistory(id) {
-  const history = getHistory();
-  const record = history.find(h => h.id === id);
-  if (!record) return;
-  messages = record.messages;
-  turnCount = record.turnCount;
-  technique = Object.keys(techniqueNames).find(k => techniqueNames[k] === record.technique) || technique;
-  mode = record.mode === '来访者模式' ? 'client' : 'counselor';
+function loadHistory(id){
+  const h = getHistory().find(x => x.id === id);
+  if (!h) return;
+  messages = h.messages; turnCount = h.turnCount;
+  technique = Object.keys(techniqueNames).find(k => techniqueNames[k] === h.technique) || technique;
+  mode = h.mode === '来访者模式' ? 'client' : 'counselor';
   isActive = true;
   document.getElementById('techniqueSelect').value = technique;
-  document.getElementById('modeSelect').value = mode;
-  onModeChange();
+  document.getElementById('modeSelect').value = mode; onModeChange();
   document.getElementById('chatBox').innerHTML = '';
-  record.messages.forEach(m => {
-    const cls = m.role === 'user' ? 'user' : 'ai';
-    addMsg(m.role, m.content, cls);
-  });
+  h.messages.forEach(m => { addMsg(m.role, m.content, m.role==='user'?'user':'ai'); });
   setInputEnabled(true);
   document.getElementById('historyModal').classList.remove('show');
   addSystemMsg('📥 已加载历史对话，可以继续练习');
 }
-
-function deleteHistory(id) {
-  let history = getHistory();
-  history = history.filter(h => h.id !== id);
-  localStorage.setItem('counseling_history', JSON.stringify(history));
-  renderHistoryList();
-  addSystemMsg('🗑 已删除');
+function deleteHistory(id){
+  let h = getHistory(); h = h.filter(x => x.id !== id);
+  localStorage.setItem('counseling_history', JSON.stringify(h));
+  renderHistoryList(); addSystemMsg('🗑 已删除');
 }
-
-function exportHistory() {
-  const history = getHistory();
-  let text = '# 心理咨询练习历史记录\n\n';
-  history.forEach((h, i) => {
-    text += `## ${i+1}. ${h.technique} - ${h.mode}\n`;
-    text += `*${h.date}* | ${h.messages.length}条消息\n\n`;
-    h.messages.forEach(m => {
-      const role = m.role === 'user' ? '🧑 我' : '🤖 AI';
-      text += `${role}: ${m.content}\n\n`;
-    });
+function exportHistory(){
+  const h = getHistory();
+  let text = '# 心理咨询练习历史\n\n';
+  h.forEach((x,i) => {
+    text += `## ${i+1}. ${x.technique} - ${x.mode}\n*${x.date}* | ${x.messages.length}条\n\n`;
+    x.messages.forEach(m => { text += `${m.role==='user'?'🧑 我':'🤖 AI'}: ${m.content}\n\n`; });
     text += '---\n\n';
   });
-  const blob = new Blob([text], { type: 'text/markdown' });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = 'counseling_history_' + new Date().toISOString().slice(0,10) + '.md';
-  a.click();
-  addSystemMsg('📥 历史记录已导出为 Markdown 文件');
+  const b = new Blob([text],{type:'text/markdown'});
+  const a = document.createElement('a'); a.href = URL.createObjectURL(b);
+  a.download = 'counseling_history_'+new Date().toISOString().slice(0,10)+'.md'; a.click();
+  addSystemMsg('📥 已导出');
 }
 
 // Init
-onModeChange();
-onTechniqueChange();
-setInputEnabled(false);
+onModeChange(); onTechniqueChange(); setInputEnabled(false);
 </script>
 </body>
 </html>
