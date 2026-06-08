@@ -451,23 +451,50 @@ function requestFeedback(){ if (isActive && mode === 'counselor') { document.get
 function resetChat(){ messages = []; turnCount = 0; isActive = false; document.getElementById('chatBox').innerHTML = ''; addSystemMsg('对话已重置。选择技术和模式后点击「开始练习」。'); setInputEnabled(false); }
 
 // ==================== History ====================
-function getHistory(){ try { return JSON.parse(localStorage.getItem('counseling_history') || '[]'); } catch(e) { return []; } }
+function getHistory(){
+  try {
+    const raw = localStorage.getItem('counseling_history');
+    if (!raw) return [];
+    return JSON.parse(raw);
+  } catch(e) {
+    console.error('getHistory error:', e);
+    return [];
+  }
+}
 function saveHistorySilent(){
-  const history = getHistory();
-  history.unshift({ id: Date.now(), date: new Date().toLocaleString('zh-CN'), technique: techniqueNames[technique]||'未选择', mode: mode==='client'?'来访者模式':'咨询师模式', messages: [...messages], turnCount });
-  if (history.length > 50) history.length = 50;
-  localStorage.setItem('counseling_history', JSON.stringify(history));
-  renderHistoryList();
-  document.getElementById('historyList').style.display = 'block';
+  try {
+    const history = getHistory();
+    // Clean messages for JSON serialization
+    const cleanMessages = messages.map(m => ({ role: m.role, content: String(m.content || '') }));
+    history.unshift({
+      id: Date.now(),
+      date: new Date().toLocaleString('zh-CN'),
+      technique: techniqueNames[technique]||'未选择',
+      mode: mode==='client'?'来访者模式':'咨询师模式',
+      messages: cleanMessages,
+      turnCount
+    });
+    if (history.length > 50) history.length = 50;
+    const json = JSON.stringify(history);
+    localStorage.setItem('counseling_history', json);
+    // Verify it was saved
+    const verify = localStorage.getItem('counseling_history');
+    if (!verify) throw new Error('localStorage write failed');
+    renderHistoryList();
+    document.getElementById('historyList').style.display = 'block';
+    return true;
+  } catch(e) {
+    console.error('Save failed:', e);
+    addSystemMsg('❌ 保存失败: ' + e.message + '。请检查浏览器存储空间。');
+    return false;
+  }
 }
 function saveHistory(){
   if (messages.length === 0) { addSystemMsg('💡 请先开始练习，有对话内容后再保存'); return; }
-  saveHistorySilent();
+  const ok = saveHistorySilent();
+  if (!ok) return;
   const saved = getHistory();
-  const count = saved.length;
-  const last = saved[0];
-  addSystemMsg(`💾 已保存！「${last.technique}」${messages.length}条消息 · 历史共${count}条`);
-  // Auto-show the modal so user can verify it saved
+  addSystemMsg(`💾 已保存！「${saved[0].technique}」${messages.length}条消息 · 历史共${saved.length}条`);
   showHistoryModal();
 }
 
