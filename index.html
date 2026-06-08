@@ -314,7 +314,7 @@ function setInputEnabled(enabled){
   document.getElementById('sendBtn').disabled = !enabled;
   document.getElementById('userInput').disabled = !enabled;
   document.getElementById('feedbackBtn').disabled = !enabled || mode !== 'counselor';
-  document.getElementById('saveBtn').disabled = !enabled || messages.length < 2;
+  document.getElementById('saveBtn').disabled = !enabled || messages.length === 0;
 }
 
 // ==================== API ====================
