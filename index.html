@@ -459,15 +459,43 @@ function saveHistorySilent(){
   if (history.length > 50) history.length = 50;
   localStorage.setItem('counseling_history', JSON.stringify(history));
   renderHistoryList();
-  // Auto-show the history list
   document.getElementById('historyList').style.display = 'block';
 }
-function saveHistory(){ if (messages.length < 2) { addSystemMsg('💡 还没有对话内容'); return; } saveHistorySilent(); addSystemMsg('💾 已保存'); }
+function saveHistory(){
+  if (messages.length < 2) { addSystemMsg('💡 还没有对话内容可以保存'); return; }
+  saveHistorySilent();
+  addSystemMsg(`💾 已保存！共 ${messages.length} 条对话 → 点击 📋 查看`);
+  // On mobile, hint user to open sidebar
+  if (window.innerWidth <= 768) {
+    setTimeout(() => addSystemMsg('👈 点击左上角 ☰ 查看历史记录'), 500);
+  }
+}
 
 function toggleHistory(){
+  // Show modal instead of sidebar list
   renderHistoryList();
-  const list = document.getElementById('historyList');
-  list.style.display = list.style.display === 'none' ? 'block' : 'none';
+  showHistoryModal();
+}
+
+function showHistoryModal(){
+  const history = getHistory();
+  if (history.length === 0) { addSystemMsg('📋 暂无历史记录'); return; }
+  const detail = document.getElementById('historyDetail');
+  detail.innerHTML = history.map((h, i) => {
+    const label = h.technique + ' · ' + h.mode;
+    return `<div class="history-item" style="flex-direction:column;align-items:flex-start;gap:4px" onclick="event.stopPropagation()">
+      <div style="display:flex;justify-content:space-between;width:100%">
+        <b style="font-size:13px">${i+1}. ${label}</b>
+        <span style="color:#999;font-size:11px">${h.date}</span>
+      </div>
+      <div style="color:#666;font-size:11px">${h.messages.length}条消息 · ${h.turnCount}轮对话</div>
+      <div style="display:flex;gap:6px;margin-top:4px">
+        <button class="btn outline small" onclick="loadHistory(${h.id})">📥 加载</button>
+        <button class="btn outline small" onclick="deleteHistory(${h.id});showHistoryModal()">🗑 删除</button>
+      </div>
+    </div>`;
+  }).join('');
+  document.getElementById('historyModal').classList.add('show');
 }
 function renderHistoryList(){
   const history = getHistory();
