@@ -459,6 +459,8 @@ function saveHistorySilent(){
   if (history.length > 50) history.length = 50;
   localStorage.setItem('counseling_history', JSON.stringify(history));
   renderHistoryList();
+  // Auto-show the history list
+  document.getElementById('historyList').style.display = 'block';
 }
 function saveHistory(){ if (messages.length < 2) { addSystemMsg('💡 还没有对话内容'); return; } saveHistorySilent(); addSystemMsg('💾 已保存'); }
 
