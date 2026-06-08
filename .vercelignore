@@ -1,0 +1,13 @@
+videos
+audio
+transcripts
+node_modules
+venv
+*.mjs
+*.py
+*.sh
+*.json
+!transcripts_kb.js
+CLAUDE.md
+counseling_practice.md
+scenario_bank.md
