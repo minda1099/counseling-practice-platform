@@ -530,52 +530,132 @@ function exportHistory(){
 }
 
 // ==================== Speech Recognition ====================
+let mediaRecorder = null;
+let audioChunks = [];
+
 function toggleMic(){
   if (isListening) { stopListening(); return; }
 
+  // Try browser Web Speech API first (won't work in China)
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (!SpeechRecognition) { alert('当前浏览器不支持语音输入。请使用 Chrome 或 Edge。'); return; }
+  if (SpeechRecognition) {
+    tryBrowserSTT(SpeechRecognition);
+  } else {
+    tryRecordThenAPI();
+  }
+}
 
+function tryBrowserSTT(SpeechRecognition) {
   recognition = new SpeechRecognition();
   recognition.lang = 'zh-CN';
   recognition.interimResults = true;
   recognition.continuous = true;
-  recognition.maxAlternatives = 1;
 
   recognition.onresult = (event) => {
     let transcript = '';
     for (let i = event.resultIndex; i < event.results.length; i++) {
       transcript += event.results[i][0].transcript;
     }
-    // Update input field in real-time - user can see and edit
     document.getElementById('userInput').value = transcript;
-    document.getElementById('userInput').focus();
   };
 
   recognition.onerror = (event) => {
-    if (event.error === 'no-speech') return; // Ignore silence
-    if (event.error === 'aborted') return;
-    addSystemMsg('🎤 语音识别出错: ' + event.error);
+    if (event.error === 'no-speech' || event.error === 'aborted') return;
+    // Network error = can't reach Google (common in China). Fall back to recording.
+    if (event.error === 'network' || event.error === 'not-allowed') {
+      stopListening();
+      addSystemMsg('🎤 浏览器语音不可用，改用录音转文字…');
+      tryRecordThenAPI();
+      return;
+    }
+    addSystemMsg('🎤 语音出错: ' + event.error);
     stopListening();
   };
 
   recognition.onend = () => {
-    if (isListening) {
-      // Auto-restart for continuous listening
-      try { recognition.start(); } catch(e) { stopListening(); }
-    }
+    if (isListening) { try { recognition.start(); } catch(e) { stopListening(); } }
   };
 
-  recognition.start();
+  try { recognition.start(); startListeningUI(); } catch(e) { tryRecordThenAPI(); }
+}
+
+async function tryRecordThenAPI() {
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm;codecs=opus' });
+    audioChunks = [];
+
+    mediaRecorder.ondataavailable = (e) => { if (e.data.size > 0) audioChunks.push(e.data); };
+
+    mediaRecorder.onstop = async () => {
+      stream.getTracks().forEach(t => t.stop());
+      const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+      await transcribeAudio(audioBlob);
+    };
+
+    mediaRecorder.start();
+    startListeningUI();
+    addSystemMsg('🎤 录音中，点击🔴停止并转文字');
+  } catch(e) {
+    stopListening();
+    addSystemMsg('❌ 无法访问麦克风: ' + e.message);
+  }
+}
+
+async function transcribeAudio(audioBlob) {
+  addSystemMsg('📝 正在转文字…');
+  const apiKey = localStorage.getItem('counseling_api_key');
+  const apiBase = localStorage.getItem('counseling_api_base') || 'https://api.deepseek.com/v1';
+
+  if (!apiKey) {
+    addSystemMsg('❌ 请先设置API Key');
+    stopListening();
+    return;
+  }
+
+  try {
+    const formData = new FormData();
+    formData.append('file', audioBlob, 'recording.webm');
+    formData.append('model', 'whisper-1');
+    formData.append('language', 'zh');
+
+    const resp = await fetch(`${apiBase}/audio/transcriptions`, {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${apiKey}` },
+      body: formData
+    });
+
+    if (!resp.ok) {
+      // DeepSeek doesn't support audio API - tell user
+      if (resp.status === 404 || resp.status === 405) {
+        addSystemMsg('❌ 当前API不支持语音转文字。请使用支持 whisper 的接口（如 OpenAI），或使用VPN后重试浏览器语音。');
+        stopListening();
+        return;
+      }
+      throw new Error(`HTTP ${resp.status}`);
+    }
+
+    const data = await resp.json();
+    document.getElementById('userInput').value = data.text || '';
+    document.getElementById('userInput').focus();
+    addSystemMsg('✅ 转文字完成，可编辑后发送');
+  } catch(e) {
+    addSystemMsg('❌ 转文字失败: ' + e.message);
+  }
+  stopListening();
+}
+
+function startListeningUI() {
   isListening = true;
   document.getElementById('micBtn').textContent = '🔴';
   document.getElementById('micBtn').classList.add('listening');
-  document.getElementById('userInput').placeholder = '正在聆听…说完点击🔴停止';
+  document.getElementById('userInput').placeholder = '聆听中…点击🔴停止';
 }
 
 function stopListening(){
   isListening = false;
   if (recognition) { try { recognition.stop(); } catch(e) {} }
+  if (mediaRecorder && mediaRecorder.state === 'recording') { mediaRecorder.stop(); }
   document.getElementById('micBtn').textContent = '🎤';
   document.getElementById('micBtn').classList.remove('listening');
   document.getElementById('userInput').placeholder = '输入或语音…';
