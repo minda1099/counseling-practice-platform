@@ -463,8 +463,12 @@ function saveHistorySilent(){
 function saveHistory(){
   if (messages.length === 0) { addSystemMsg('💡 请先开始练习，有对话内容后再保存'); return; }
   saveHistorySilent();
-  const count = getHistory().length;
-  addSystemMsg(`💾 已保存！共 ${messages.length} 条对话，历史总计 ${count} 条。点击右上角 📋 查看`);
+  const saved = getHistory();
+  const count = saved.length;
+  const last = saved[0];
+  addSystemMsg(`💾 已保存！「${last.technique}」${messages.length}条消息 · 历史共${count}条`);
+  // Auto-show the modal so user can verify it saved
+  showHistoryModal();
 }
 
 function toggleHistory(){
