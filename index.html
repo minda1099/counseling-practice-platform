@@ -312,22 +312,22 @@ function addSystemMsg(text){ addMsg('system', text, 'system'); }
 
 // Simple markdown renderer
 function renderMarkdown(text) {
-  // Escape HTML first
   let html = text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-  // Bold: **text**
+  // Headers
+  html = html.replace(/^### (.+)$/gm, '<h4 style="margin:8px 0 2px">$1</h4>');
+  html = html.replace(/^## (.+)$/gm, '<h3 style="margin:10px 0 2px">$1</h3>');
+  // Emoji headers
+  html = html.replace(/^(✅|🔧|💡|📚) (.+)$/gm, '<div style="margin:6px 0 1px"><b>$1 $2</b></div>');
+  // Bold
   html = html.replace(/\*\*(.+?)\*\*/g, '<b>$1</b>');
-  // Headers: ### text
-  html = html.replace(/^### (.+)$/gm, '<h4 style="margin:8px 0 4px">$1</h4>');
-  html = html.replace(/^## (.+)$/gm, '<h3 style="margin:10px 0 4px">$1</h3>');
-  // Inline code: `text`
+  // Inline code
   html = html.replace(/`(.+?)`/g, '<code style="background:rgba(0,0,0,.06);padding:1px 4px;border-radius:3px">$1</code>');
-  // Numbered lists: 1. item
-  html = html.replace(/^(\d+)\. (.+)$/gm, '<div style="margin:2px 0 2px 12px">$1. $2</div>');
-  // Bullet lists: - item or * item
-  html = html.replace(/^[-*] (.+)$/gm, '<div style="margin:2px 0 2px 12px">• $1</div>');
-  // Emoji headers (keep emoji, wrap in bold)
-  html = html.replace(/^(✅|🔧|💡|📚) (.+)$/gm, '<div style="margin:6px 0 2px"><b>$1 $2</b></div>');
-  // Newlines to <br> (but not inside tags)
+  // Lists
+  html = html.replace(/^(\d+)\. (.+)$/gm, '<div style="margin:1px 0 1px 12px">$1. $2</div>');
+  html = html.replace(/^[-*] (.+)$/gm, '<div style="margin:1px 0 1px 12px">• $1</div>');
+  // Collapse consecutive blank lines into single <br>
+  html = html.replace(/\n{2,}/g, '\n');
+  // Remaining single newlines
   html = html.replace(/\n/g, '<br>');
   return html;
 }
