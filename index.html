@@ -296,14 +296,41 @@ function onModeChange(){
 
 function addMsg(role, text, className){
   const div = document.createElement('div');
-  div.className = 'msg ' + (className || role);
-  div.textContent = text;
+  const cls = className || role;
+  div.className = 'msg ' + cls;
+  // Render markdown for supervision/ai messages, plain text for user/system
+  if (cls === 'supervision' || cls === 'ai') {
+    div.innerHTML = renderMarkdown(text);
+  } else {
+    div.textContent = text;
+  }
   document.getElementById('chatBox').appendChild(div);
   document.getElementById('chatBox').scrollTop = document.getElementById('chatBox').scrollHeight;
-  // Re-evaluate button states after each message
   updateButtonStates();
 }
 function addSystemMsg(text){ addMsg('system', text, 'system'); }
+
+// Simple markdown renderer
+function renderMarkdown(text) {
+  // Escape HTML first
+  let html = text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  // Bold: **text**
+  html = html.replace(/\*\*(.+?)\*\*/g, '<b>$1</b>');
+  // Headers: ### text
+  html = html.replace(/^### (.+)$/gm, '<h4 style="margin:8px 0 4px">$1</h4>');
+  html = html.replace(/^## (.+)$/gm, '<h3 style="margin:10px 0 4px">$1</h3>');
+  // Inline code: `text`
+  html = html.replace(/`(.+?)`/g, '<code style="background:rgba(0,0,0,.06);padding:1px 4px;border-radius:3px">$1</code>');
+  // Numbered lists: 1. item
+  html = html.replace(/^(\d+)\. (.+)$/gm, '<div style="margin:2px 0 2px 12px">$1. $2</div>');
+  // Bullet lists: - item or * item
+  html = html.replace(/^[-*] (.+)$/gm, '<div style="margin:2px 0 2px 12px">• $1</div>');
+  // Emoji headers (keep emoji, wrap in bold)
+  html = html.replace(/^(✅|🔧|💡|📚) (.+)$/gm, '<div style="margin:6px 0 2px"><b>$1 $2</b></div>');
+  // Newlines to <br> (but not inside tags)
+  html = html.replace(/\n/g, '<br>');
+  return html;
+}
 function updateButtonStates(){
   if (!isActive) return;
   document.getElementById('saveBtn').disabled = messages.length === 0;
